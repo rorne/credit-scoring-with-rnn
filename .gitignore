@@ -2,9 +2,6 @@ venv/
 *.venv
 .env
 
-__pycache__/
-*.py
-
 *.csv
 
 *.log
