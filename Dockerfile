@@ -1,11 +1,11 @@
-FROM python:3.8-slim
+FROM python:3.8
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
-COPY requirements.txt ./
+COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY src/ ./src
-COPY scripts/ ./scripts
+COPY . .
 
-CMD [ "python", "./scripts/train.py" ]
+CMD ["python", "scripts/train.py"]
