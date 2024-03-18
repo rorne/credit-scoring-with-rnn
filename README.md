@@ -1,4 +1,40 @@
 # Нейросетевой подход к кредитному скорингу
+Структура проекта:
+
+.
+├── Dockerfile
+
+├── Image
+
+│   └── architecture.jpg
+
+├── README.md
+
+├── checkpoints
+
+│   └── pytorch_baseline
+
+├── credit-scoring
+
+│   ├── data_generators.py
+
+│   ├── dataset_preprocessing_utils.py
+
+│   ├── model.py
+
+│   ├── preprocess.py
+
+│   ├── pytorch_training.py
+
+│   ├── training_aux.py
+
+│   └── utils.py
+
+├── infer.py
+
+├── requirements.txt
+
+└── train.py
 
 ## 1. Формулировка задачи
 
