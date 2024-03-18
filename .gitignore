@@ -1,7 +1,7 @@
-venv/
-*.venv
-.env
+data/
+checkpoints/
 
-*.csv
+*.ipynb
 
-*.log
+__pycache__/
+*.py[cod]
