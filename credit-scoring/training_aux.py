@@ -53,9 +53,6 @@ class EarlyStopping:
             self.save_checkpoint(metric_value, model)
         elif score < self.best_score + self.delta:
             self.counter += 1
-            print(
-                f"No imporvement in validation {self.metric_name}. Current: {score:.6f}. Current best: {self.best_score:.6f}")
-            print(f"EarlyStopping counter: {self.counter} out of {self.patience}")
             if self.counter >= self.patience:
                 self.early_stop = True
         else:
@@ -78,9 +75,6 @@ class EarlyStopping:
         ----------------------
         None
         """
-        if self.verbose:
-            print(
-                f"Validation {self.metric_name} improved ({self.best_prev_score:.6f} --> {metric_value:.6f}).  Saving model...")
         if self.save_format == "tf":
             model.save_weights(self.save_path)
         else:

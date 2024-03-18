@@ -2,7 +2,6 @@ from typing import Dict
 import numpy as np
 import pandas as pd
 import pickle
-from tqdm.notebook import tqdm
 
 
 features = ["pre_since_opened", "pre_since_confirmed", "pre_pterm", "pre_fterm", "pre_till_pclose", "pre_till_fclose",
@@ -106,7 +105,7 @@ def create_padded_buckets(frame_of_sequences: pd.DataFrame, bucket_info: Dict[in
     targets = []
     ids = []
 
-    for size, bucket in tqdm(frame_of_sequences.groupby("bucket_idx"), desc="Extracting buckets"):
+    for size, bucket in frame_of_sequences.groupby("bucket_idx"):
         padded_sequences = bucket["sequences"].apply(lambda x: pad_sequence(x, size)).values
         padded_seq.append(np.stack(padded_sequences, axis=0))
 
@@ -118,8 +117,8 @@ def create_padded_buckets(frame_of_sequences: pd.DataFrame, bucket_info: Dict[in
     frame_of_sequences.drop(columns=["bucket_idx"], inplace=True)
 
     dict_result = {
-        "id": np.array(ids, dtype=np.object),
-        "padded_sequences": np.array(padded_seq, dtype=np.object),
+        "id": np.array(ids, dtype=object),
+        "padded_sequences": np.array(padded_seq, dtype=object),
         "target": np.array(targets, dtype=np.object) if targets else []
     }
 
