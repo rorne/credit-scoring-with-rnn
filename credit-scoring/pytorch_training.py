@@ -2,10 +2,9 @@ from typing import List
 import torch
 import pandas as pd
 import torch.nn as nn
-from tqdm import tqdm_notebook
 from sklearn.metrics import roc_auc_score
 
-from rnn_baseline.data_generators import batches_generator
+from data_generators import batches_generator
 
 
 def train_epoch(model: torch.nn.Module, optimizer: torch.optim.Optimizer, dataset_train: List[str],
@@ -42,7 +41,7 @@ def train_epoch(model: torch.nn.Module, optimizer: torch.optim.Optimizer, datase
     train_generator = batches_generator(dataset_train, batch_size=batch_size, shuffle=shuffle,
                                         device=device, is_train=True, output_format="torch")
 
-    for num_batch, batch in tqdm_notebook(enumerate(train_generator, start=1), desc="Training"):
+    for num_batch, batch in enumerate(train_generator, start=1):
         output = torch.flatten(model(batch["features"]))
         batch_loss = loss_function(output, batch["label"].float())
         batch_loss.mean().backward()
@@ -56,8 +55,6 @@ def train_epoch(model: torch.nn.Module, optimizer: torch.optim.Optimizer, datase
             print(f"Batches {num_batch - print_loss_every_n_batches + 1} - {num_batch} loss:"
                   f"{losses[-samples_counter:].mean()}", end="\r")
             samples_counter = 0
-
-    print(f"Training loss after epoch: {losses.mean()}", end="\r")
 
 
 def eval_model(model: torch.nn.Module, dataset_val: List[str], batch_size: int = 32, device: torch.device = None) -> float:
@@ -85,7 +82,7 @@ def eval_model(model: torch.nn.Module, dataset_val: List[str], batch_size: int =
     val_generator = batches_generator(dataset_val, batch_size=batch_size, shuffle=False,
                                       device=device, is_train=True, output_format="torch")
 
-    for batch in tqdm_notebook(val_generator, desc="Evaluating model"):
+    for batch in val_generator:
         targets.extend(batch["label"].detach().cpu().numpy().flatten())
         output = model(batch["features"])
         preds.extend(output.detach().cpu().numpy().flatten())
@@ -120,7 +117,7 @@ def inference(model: torch.nn.Module, dataset_test: List[str], batch_size: int =
                                        verbose=False, device=device, is_train=False,
                                        output_format="torch")
 
-    for batch in tqdm_notebook(test_generator, desc="Test predictions"):
+    for batch in test_generator:
         ids.extend(batch["id_"])
         output = model(batch["features"])
         preds.extend(output.detach().cpu().numpy().flatten())

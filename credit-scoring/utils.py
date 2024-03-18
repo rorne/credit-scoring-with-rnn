@@ -1,6 +1,5 @@
 import os
 import pandas as pd
-import tqdm
 from typing import List
 
 
@@ -33,9 +32,7 @@ def read_parquet_dataset_from_local(path_to_dataset: str, start_from: int = 0, n
                      for filename in os.listdir(path_to_dataset)}
     chunks = [dataset_paths[num] for num in sorted(dataset_paths.keys()) if num>=start_from][:num_parts_to_read]
     
-    if verbose:
-        print("Reading chunks:", *chunks, sep="\n")
-    for chunk_path in tqdm.tqdm_notebook(chunks, desc="Reading dataset with pandas"):
+    for chunk_path in chunks:
         chunk = pd.read_parquet(chunk_path, columns=columns)
         res.append(chunk)
     return pd.concat(res).reset_index(drop=True)

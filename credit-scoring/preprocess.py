@@ -2,12 +2,10 @@ def create_buckets_from_credits(path_to_dataset, bucket_info, save_to_path, fram
                                 num_parts_to_preprocess_at_once: int = 1, 
                                 num_parts_total=50, has_target=False):
     block = 0
-    for step in tqdm.notebook.tqdm(range(0, num_parts_total, num_parts_to_preprocess_at_once),
-                     desc="Preparing credit data"):
+    for step in range(0, num_parts_total, num_parts_to_preprocess_at_once):
         credits_frame = read_parquet_dataset_from_local(path_to_dataset, step, num_parts_to_preprocess_at_once, verbose=True)
         credits_frame.loc[:, features] += 1       
         seq = transform_credits_to_sequences(credits_frame)
-        print("Transforming credits to sequences is done.")
         
         if frame_with_ids is not None:
             seq = seq.merge(frame_with_ids, on="id")

@@ -7,7 +7,6 @@ import torch
 import torch.nn as nn
 
 from sklearn.model_selection import train_test_split
-import tqdm
 from credit-scoring/utils import read_parquet_dataset_from_local
 from credit-scoring/dataset_preprocessing_utils import features, transform_credits_to_sequences, create_padded_buckets
 from collections import defaultdict
@@ -16,11 +15,48 @@ from credit-scoring/data_generators import batches_generator
 from credit-scoring/pytorch_training import train_epoch, eval_model, inference
 from credit-scoring/training_aux import EarlyStopping
 
-def main():
+import subprocess
+import os
 
-    TRAIN_BUCKETS_PATH = "../data/train_buckets_rnn"
-    VAL_BUCKETS_PATH = "../data/val_buckets_rnn"
-    TEST_BUCKETS_PATH = "../data/test_buckets_rnn"
+
+def main():
+    download_command = "wget https://storage.yandexcloud.net/ds-ods/files/materials/02464a6f/data_for_competition.zip -O data.zip"
+    subprocess.run(download_command, shell=True, check=True)
+
+    unzip_command = "unzip data.zip"
+    os.rename('data_for_competition', 'data')
+    subprocess.run(unzip_command, shell=True, check=True)
+    TRAIN_DATA_PATH = "./data/train_data/"
+    TEST_DATA_PATH = "./data/test_data/"
+
+    TRAIN_TARGET_PATH = "./data/train_target.csv"
+
+    train_target = pd.read_csv(TRAIN_TARGET_PATH)
+    train_lens = []
+    test_lens = []
+    uniques = defaultdict(set)
+
+    for step in range(0, 1, 1):
+        credits_frame = read_parquet_dataset_from_local(TRAIN_DATA_PATH, step, 4, verbose=True)
+        seq_lens = credits_frame.groupby("id").agg(seq_len=("rn", "max"))["seq_len"].values
+        train_lens.extend(seq_lens)
+        credits_frame.drop(columns=["id", "rn"], inplace=True)
+        for feat in credits_frame.columns.values:
+            uniques[feat] = uniques[feat].union(credits_frame[feat].unique())
+    train_lens = np.hstack(train_lens)
+
+    for step in range(0, 1, 1):
+        credits_frame = read_parquet_dataset_from_local(TEST_DATA_PATH, step, 2, verbose=True)
+        seq_lens = credits_frame.groupby("id").agg(seq_len=("rn", "max"))["seq_len"].values
+        test_lens.extend(seq_lens)
+        credits_frame.drop(columns=["id", "rn"], inplace=True)
+        for feat in credits_frame.columns.values:
+            uniques[feat] = uniques[feat].union(credits_frame[feat].unique())
+    test_lens = np.hstack(test_lens)
+    uniques = dict(uniques)
+    keys_ = list(range(1, 59)) 
+    lens_ = list(range(1, 41)) + [45] * 5 + [50] * 5 + [58] * 8
+    bucket_info = dict(zip(keys_, lens_))
 
     train, val = train_test_split(train_target, random_state=42, test_size=0.1)
     create_buckets_from_credits(TRAIN_DATA_PATH,
@@ -30,13 +66,19 @@ def main():
                             num_parts_to_preprocess_at_once=4, 
                             num_parts_total=12, has_target=True)
 
-    dataset_train = sorted([os.path.join(TRAIN_BUCKETS_PATH, x) for x in os.listdir(TRAIN_BUCKETS_PATH)])
+    TRAIN_BUCKETS_PATH = "../data/train_buckets_rnn"
+    VAL_BUCKETS_PATH = "../data/val_buckets_rnn"
+    TEST_BUCKETS_PATH = "../data/test_buckets_rnn"
+    for buckets_path in [TRAIN_BUCKETS_PATH, VAL_BUCKETS_PATH, TEST_BUCKETS_PATH]:
+        os.makedirs(buckets_path, exist_ok=True)
+
     create_buckets_from_credits(TRAIN_DATA_PATH,
                             bucket_info=bucket_info,
                             save_to_path=VAL_BUCKETS_PATH,
                             frame_with_ids=val,
                             num_parts_to_preprocess_at_once=4, 
                             num_parts_total=12, has_target=True)
+    dataset_train = sorted([os.path.join(TRAIN_BUCKETS_PATH, x) for x in os.listdir(TRAIN_BUCKETS_PATH)])
 
     dataset_val = sorted([os.path.join(VAL_BUCKETS_PATH, x) for x in os.listdir(VAL_BUCKETS_PATH)])
     create_buckets_from_credits(TEST_DATA_PATH,
