@@ -1,43 +1,26 @@
 # Нейросетевой подход к кредитному скорингу
-Структура проекта:
+## Структура проекта
 
-.
+Проект организован следующим образом:
 
-├── Dockerfile
+- `Dockerfile`
+- `Image/`
+  - `architecture.jpg`
+- `README.md`
+- `checkpoints/` - Чекпоинты модели.
+  - `pytorch_baseline`
+- `credit-scoring/` - Основной код проекта для моделирования кредитного скоринга.
+  - `data_generators.py`
+  - `dataset_preprocessing_utils.py`
+  - `model.py` - модель RNN.
+  - `preprocess.py`
+  - `pytorch_training.py` 
+  - `training_aux.py`
+  - `utils.py`
+- `infer.py`
+- `requirements.txt`
+- `train.py`
 
-├── Image
-
-│   └── architecture.jpg
-
-├── README.md
-
-├── data
-
-├── checkpoints
-
-│   └── pytorch_baseline
-
-├── credit-scoring
-
-│   ├── data_generators.py
-
-│   ├── dataset_preprocessing_utils.py
-
-│   ├── model.py
-
-│   ├── preprocess.py
-
-│   ├── pytorch_training.py
-
-│   ├── training_aux.py
-
-│   └── utils.py
-
-├── infer.py
-
-├── requirements.txt
-
-└── train.py
 
 ## 1. Формулировка задачи
 
