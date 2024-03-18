@@ -1,4 +1,4 @@
-FROM python:3.8
+FROM python:3.10-bookworm
 
 WORKDIR /app
 
@@ -8,4 +8,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY . .
 
-CMD ["python", "scripts/train.py"]
+CMD ["python", "./train.py"]
