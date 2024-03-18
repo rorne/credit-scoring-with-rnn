@@ -11,6 +11,8 @@
 
 ├── README.md
 
+├── data
+
 ├── checkpoints
 
 │   └── pytorch_baseline
