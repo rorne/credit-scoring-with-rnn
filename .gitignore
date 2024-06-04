@@ -10,3 +10,4 @@ __pycache__/
 *.log
 /data
 >>>>>>> 3528445 (Apply formatting changes by black and isort)
+.dvc
