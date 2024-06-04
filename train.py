@@ -7,13 +7,13 @@ import torch
 import torch.nn as nn
 
 from sklearn.model_selection import train_test_split
-from credit-scoring/utils import read_parquet_dataset_from_local
-from credit-scoring/dataset_preprocessing_utils import features, transform_credits_to_sequences, create_padded_buckets
+from credit-scoring.utils import read_parquet_dataset_from_local
+from credit-scoring.dataset_preprocessing_utils import features, transform_credits_to_sequences, create_padded_buckets
 from collections import defaultdict
 
-from credit-scoring/data_generators import batches_generator
-from credit-scoring/pytorch_training import train_epoch, eval_model, inference
-from credit-scoring/training_aux import EarlyStopping
+from credit-scoring.data_generators import batches_generator
+from credit-scoring.pytorch_training import train_epoch, eval_model, inference
+from credit-scoring.training_aux import EarlyStopping
 
 import subprocess
 import os
