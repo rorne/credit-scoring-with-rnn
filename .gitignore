@@ -3,5 +3,10 @@ checkpoints/
 
 *.ipynb
 
+<<<<<<< HEAD
 __pycache__/
 *.py[cod]
+=======
+*.log
+/data
+>>>>>>> 3528445 (Apply formatting changes by black and isort)

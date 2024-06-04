@@ -1,15 +1,21 @@
 from typing import List
-import torch
+
 import pandas as pd
+import torch
 import torch.nn as nn
+from data_generators import batches_generator
 from sklearn.metrics import roc_auc_score
 
-from data_generators import batches_generator
 
-
-def train_epoch(model: torch.nn.Module, optimizer: torch.optim.Optimizer, dataset_train: List[str],
-                batch_size: int = 64, shuffle: bool = True, print_loss_every_n_batches: int = 500,
-                device: torch.device = None):
+def train_epoch(
+    model: torch.nn.Module,
+    optimizer: torch.optim.Optimizer,
+    dataset_train: List[str],
+    batch_size: int = 64,
+    shuffle: bool = True,
+    print_loss_every_n_batches: int = 500,
+    device: torch.device = None,
+):
     """
     Делает одну эпоху обучения модели, логируя промежуточные значения функции потерь.
 
@@ -38,8 +44,14 @@ def train_epoch(model: torch.nn.Module, optimizer: torch.optim.Optimizer, datase
     loss_function = nn.BCEWithLogitsLoss(reduction="none")
     losses = torch.LongTensor().to(device)
     samples_counter = 0
-    train_generator = batches_generator(dataset_train, batch_size=batch_size, shuffle=shuffle,
-                                        device=device, is_train=True, output_format="torch")
+    train_generator = batches_generator(
+        dataset_train,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        device=device,
+        is_train=True,
+        output_format="torch",
+    )
 
     for num_batch, batch in enumerate(train_generator, start=1):
         output = torch.flatten(model(batch["features"]))
@@ -52,12 +64,20 @@ def train_epoch(model: torch.nn.Module, optimizer: torch.optim.Optimizer, datase
 
         losses = torch.cat([losses, batch_loss], dim=0)
         if num_batch % print_loss_every_n_batches == 0:
-            print(f"Batches {num_batch - print_loss_every_n_batches + 1} - {num_batch} loss:"
-                  f"{losses[-samples_counter:].mean()}", end="\r")
+            print(
+                f"Batches {num_batch - print_loss_every_n_batches + 1} - {num_batch} loss:"
+                f"{losses[-samples_counter:].mean()}",
+                end="\r",
+            )
             samples_counter = 0
 
 
-def eval_model(model: torch.nn.Module, dataset_val: List[str], batch_size: int = 32, device: torch.device = None) -> float:
+def eval_model(
+    model: torch.nn.Module,
+    dataset_val: List[str],
+    batch_size: int = 32,
+    device: torch.device = None,
+) -> float:
     """
     Скорит выборку моделью и вычисляет метрику ROC AUC.
 
@@ -79,8 +99,14 @@ def eval_model(model: torch.nn.Module, dataset_val: List[str], batch_size: int =
     model.eval()
     preds = []
     targets = []
-    val_generator = batches_generator(dataset_val, batch_size=batch_size, shuffle=False,
-                                      device=device, is_train=True, output_format="torch")
+    val_generator = batches_generator(
+        dataset_val,
+        batch_size=batch_size,
+        shuffle=False,
+        device=device,
+        is_train=True,
+        output_format="torch",
+    )
 
     for batch in val_generator:
         targets.extend(batch["label"].detach().cpu().numpy().flatten())
@@ -90,7 +116,12 @@ def eval_model(model: torch.nn.Module, dataset_val: List[str], batch_size: int =
     return roc_auc_score(targets, preds)
 
 
-def inference(model: torch.nn.Module, dataset_test: List[str], batch_size: int = 32, device: torch.device = None) -> pd.DataFrame:
+def inference(
+    model: torch.nn.Module,
+    dataset_test: List[str],
+    batch_size: int = 32,
+    device: torch.device = None,
+) -> pd.DataFrame:
     """
     Скорит выборку моделью.
 
@@ -113,16 +144,19 @@ def inference(model: torch.nn.Module, dataset_test: List[str], batch_size: int =
     model.eval()
     preds = []
     ids = []
-    test_generator = batches_generator(dataset_test, batch_size=batch_size, shuffle=False,
-                                       verbose=False, device=device, is_train=False,
-                                       output_format="torch")
+    test_generator = batches_generator(
+        dataset_test,
+        batch_size=batch_size,
+        shuffle=False,
+        verbose=False,
+        device=device,
+        is_train=False,
+        output_format="torch",
+    )
 
     for batch in test_generator:
         ids.extend(batch["id_"])
         output = model(batch["features"])
         preds.extend(output.detach().cpu().numpy().flatten())
 
-    return pd.DataFrame({
-        "id": ids,
-        "score": preds
-    })
+    return pd.DataFrame({"id": ids, "score": preds})

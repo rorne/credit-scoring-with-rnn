@@ -1,5 +1,5 @@
-import torch
 import numpy as np
+import torch
 
 
 class EarlyStopping:
@@ -25,12 +25,25 @@ class EarlyStopping:
         Формат модели. Допустимые значения: "torch", "tf" - для моделей на фреймворках pytorch и tensorflow.keras соответственно.
     """
 
-    def __init__(self, patience=7, mode='min', verbose=False, delta=0, save_path='checkpoint.hdf5', metric_name=None, save_format='torch'):
+    def __init__(
+        self,
+        patience=7,
+        mode="min",
+        verbose=False,
+        delta=0,
+        save_path="checkpoint.hdf5",
+        metric_name=None,
+        save_format="torch",
+    ):
         if mode not in ["min", "max"]:
-            raise ValueError(f"Unrecognized mode: {mode}! Please choose one of the following modes: \"min\", \"max\"")
+            raise ValueError(
+                f'Unrecognized mode: {mode}! Please choose one of the following modes: "min", "max"'
+            )
 
         if save_format not in ["torch", "tf"]:
-            raise ValueError(f"Unrecognized format: {save_format}! Please choose one of the following formats: \"torch\", \"tf\"")
+            raise ValueError(
+                f'Unrecognized format: {save_format}! Please choose one of the following formats: "torch", "tf"'
+            )
 
         self.patience = patience
         self.mode = mode
@@ -60,7 +73,9 @@ class EarlyStopping:
             self.save_checkpoint(metric_value, model)
             self.counter = 0
 
-    def save_checkpoint(self, metric_value: float, model: torch.nn.Module or tensorflow.keras.Model):
+    def save_checkpoint(
+        self, metric_value: float, model: torch.nn.Module or tensorflow.keras.Model
+    ):
         """
         Cохраняет модель, если валидационная метрика улучшилась.
 

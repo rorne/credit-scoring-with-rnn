@@ -1,10 +1,16 @@
 import os
-import pandas as pd
 from typing import List
 
+import pandas as pd
 
-def read_parquet_dataset_from_local(path_to_dataset: str, start_from: int = 0, num_parts_to_read: int = 2, 
-                                    columns: List[str] = None, verbose: bool = False) -> pd.DataFrame:
+
+def read_parquet_dataset_from_local(
+    path_to_dataset: str,
+    start_from: int = 0,
+    num_parts_to_read: int = 2,
+    columns: List[str] = None,
+    verbose: bool = False,
+) -> pd.DataFrame:
     """
     Читает ``num_parts_to_read`` партиций и преобразует их к pandas.DataFrame.
 
@@ -28,10 +34,16 @@ def read_parquet_dataset_from_local(path_to_dataset: str, start_from: int = 0, n
     res = []
     start_from = max(0, start_from)
     # dictionory of format {partition number: partition filename}
-    dataset_paths = {int(os.path.splitext(filename)[0].split("_")[-1]): os.path.join(path_to_dataset, filename)
-                     for filename in os.listdir(path_to_dataset)}
-    chunks = [dataset_paths[num] for num in sorted(dataset_paths.keys()) if num>=start_from][:num_parts_to_read]
-    
+    dataset_paths = {
+        int(os.path.splitext(filename)[0].split("_")[-1]): os.path.join(
+            path_to_dataset, filename
+        )
+        for filename in os.listdir(path_to_dataset)
+    }
+    chunks = [
+        dataset_paths[num] for num in sorted(dataset_paths.keys()) if num >= start_from
+    ][:num_parts_to_read]
+
     for chunk_path in chunks:
         chunk = pd.read_parquet(chunk_path, columns=columns)
         res.append(chunk)

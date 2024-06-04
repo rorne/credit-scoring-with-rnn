@@ -1,0 +1,4 @@
+data:
+  train_path: ./data/train_data/
+  test_path: ./data/test_data/
+  train_target_path: ./data/train_target.csv

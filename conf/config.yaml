@@ -1,0 +1,4 @@
+defaults:
+  - model: rnn
+  - data: default
+  - training: default
