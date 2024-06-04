@@ -1,6 +1,6 @@
 import torch
-from credit-scoring/pytorch_training import inference
-from credit-scoring/preprocess import create_buckets_from_credits
+from credit-scoring.pytorch_training import inference
+from credit-scoring.preprocess import create_buckets_from_credits
 
 def main():
     TEST_DATA_PATH = "./data/test_data/"
